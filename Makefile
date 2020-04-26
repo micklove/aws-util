@@ -1,5 +1,7 @@
 PROJECT_NAME=S3Util
-JAR:=target/$(PROJECT_NAME)-1.0-SNAPSHOT.jar
+PROJECT_VERSION=1.0-SNAPSHOT
+JAR:=target/$(PROJECT_NAME)-$(PROJECT_VERSION).jar
+JAR_WITH_DEPENDENCIES:=target/$(PROJECT_NAME)-$(PROJECT_VERSION)-jar-with-dependencies.jar
 APP_MAIN_CLASS:=$(PROJECT_NAME)
 FILE_TO_UPLOAD?=$(CURDIR)/testfile.txt
 
@@ -16,6 +18,14 @@ run: validate-args $(JAR) $(FILE_TO_UPLOAD) ## Build and execute the program e.g
 		-Dexec.commandLineArgs="$(BUCKET_NAME)" \
 		-Dexec.mainClass="$(APP_MAIN_CLASS)" \
 		-Dexec.cleanupDaemonThreads=false
+
+# Run as standard jar (added config to make jar with deps file, in the target folder)
+run-with-deps: validate-args $(JAR) $(FILE_TO_UPLOAD) ## Build and execute the program AWS_PROFILE=some make run-with-deps FILE_TO_UPLOAD=/my/file/path BUCKET_NAME=my-bucket-name ROLE_TO_ASSUME_NAME=my-role
+	java -cp $(JAR_WITH_DEPENDENCIES) \
+		$(APP_MAIN_CLASS) \
+		$(FILE_TO_UPLOAD) \
+		$(BUCKET_NAME) \
+		$(ROLE_TO_ASSUME_NAME)
 
 $(JAR): pom.xml src/main/java/*.java
 	mvn clean install
