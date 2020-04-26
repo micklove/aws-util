@@ -1,14 +1,21 @@
-PROJECT_NAME=S3Util
-PROJECT_VERSION=1.0-SNAPSHOT
+
+# See https://stackoverflow.com/a/41115011/178808
+PROJECT_NAME=$(shell xmllint --xpath '/*[local-name()="project"]/*[local-name()="artifactId"]/text()' pom.xml)
+PROJECT_VERSION=$(shell xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml)
 JAR:=target/$(PROJECT_NAME)-$(PROJECT_VERSION).jar
 JAR_WITH_DEPENDENCIES:=target/$(PROJECT_NAME)-$(PROJECT_VERSION)-jar-with-dependencies.jar
-APP_MAIN_CLASS:=$(PROJECT_NAME)
 FILE_TO_UPLOAD?=$(CURDIR)/testfile.txt
+APP_MAIN_CLASS=$(PROJECT_NAME)
 
 BUCKET_NAME=
 ROLE_TO_ASSUME_NAME=
 
 -include ./lib/help.mk
+dump:
+	@echo PROJECT_VERSION: $(PROJECT_VERSION)
+	@echo JAR: $(JAR)
+	@echo APP_MAIN_CLASS: $(APP_MAIN_CLASS)
+
 
 all: validate-args clean $(JAR) run
 
@@ -36,6 +43,17 @@ dump-classpath: ## Show dependencies (classpath)
 		| grep -vE "\[.*\]" \
 		| grep -v "mvn dependency" \
 		| tr ":" "\n"
+
+dump-cp: ## Dump classpath to file
+	mvn dependency:build-classpath \
+	-Dmdep.pathSeparator="@REPLACEWITHCOMMA" \
+	-Dmdep.prefix='' \
+	-Dmdep.fileSeparator="@" \
+	-Dmdep.outputFile=classpath
+
+dump-cp-list:
+	mvn dependency:list \
+		-Dmdep.outputFile=classpath
 
 validate-args:
 	$(if $(strip $(BUCKET_NAME)),,$(error BUCKET_NAME required, [$(BUCKET_NAME)] is invalid))

@@ -118,4 +118,7 @@ dist
 .java-version
 ml-test.sh
 target
+testfile.txt
+classpath
+
 
