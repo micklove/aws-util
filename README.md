@@ -1,4 +1,4 @@
-# AWS S3 util test
+# AWS S3 util test class
 
 Simple java project, to test uploading a file to S3 with...
 
@@ -20,11 +20,10 @@ Simple java project, to test uploading a file to S3 with...
 ## Running
 Execute the following:
 
-    AWS_PROFILE=my-profile \
+    AWS_PROFILE=sandbox \
         make run \
-            BUCKET_NAME=my-bucket-name \
-            ROLE_TO_ASSUME=my-role-to-assume
----
+            BUCKET_NAME="my-bucket-name" \
+            ROLE_TO_ASSUME_NAME="my-role-to-assume"
 
 This will:
 * Build the project with mvn
