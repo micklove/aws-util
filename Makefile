@@ -19,6 +19,7 @@ run: validate-args $(JAR) $(FILE_TO_UPLOAD) ## Build and execute the program e.g
 		-Dexec.mainClass="$(APP_MAIN_CLASS)" \
 		-Dexec.cleanupDaemonThreads=false
 
+#nb: To use, use the jar-with-dependencies assembly config in the pom.xml
 # Run as standard jar (added config to make jar with deps file, in the target folder)
 run-with-deps: validate-args $(JAR) $(FILE_TO_UPLOAD) ## Build and execute the program AWS_PROFILE=some make run-with-deps FILE_TO_UPLOAD=/my/file/path BUCKET_NAME=my-bucket-name ROLE_TO_ASSUME_NAME=my-role
 	java -cp $(JAR_WITH_DEPENDENCIES) \
@@ -29,6 +30,12 @@ run-with-deps: validate-args $(JAR) $(FILE_TO_UPLOAD) ## Build and execute the p
 
 $(JAR): pom.xml src/main/java/*.java
 	mvn clean install
+
+dump-classpath: ## Show dependencies (classpath)
+	mvn dependency:build-classpath \
+		| grep -vE "\[.*\]" \
+		| grep -v "mvn dependency" \
+		| tr ":" "\n"
 
 validate-args:
 	$(if $(strip $(BUCKET_NAME)),,$(error BUCKET_NAME required, [$(BUCKET_NAME)] is invalid))
