@@ -64,6 +64,11 @@ public class S3Util {
             System.out.printf("\nPushing [%s] to [%s]\n", context.localFileName, context.bucketName);
             PutObjectRequest putObjectRequest = new PutObjectRequest(context.bucketName, context.fileKeyName, new File(context.localFileName))
                     .withCannedAcl(CannedAccessControlList.BucketOwnerFullControl);
+
+            ObjectMetadata objectMetadata  = new ObjectMetadata();
+            objectMetadata.setSSEAlgorithm(ObjectMetadata.AES_256_SERVER_SIDE_ENCRYPTION);
+            putObjectRequest.setMetadata(objectMetadata);
+
             PutObjectResult result = s3Client.putObject(putObjectRequest);
             System.out.println("result contentMd5= " + result.getContentMd5());
         } catch (AmazonServiceException e) {
